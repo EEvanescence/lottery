@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lottery</title>
+  <title>گردونه قرعه‌کشی</title>
   <style>
     :root {
       --bg-main: #121316;
@@ -75,13 +75,14 @@
       justify-content: center;
       align-items: center;
       width: 100%;
-      max-width: 540px;
+      max-width: 500px;
       aspect-ratio: 1 / 1;
       margin: 0 auto;
       user-select: none;
     }
 
     canvas#wheelCanvas {
+      display: block;
       width: 100%;
       height: 100%;
       cursor: pointer;
@@ -119,14 +120,13 @@
     }
 
     .spin-label {
-      background: rgba(18, 19, 22, 0.72);
+      background: rgba(18, 19, 22, 0.75);
       backdrop-filter: blur(4px);
       color: #fff;
       padding: 8px 18px;
       border-radius: 999px;
       font-weight: 700;
       font-size: 1.05rem;
-      letter-spacing: 0.2px;
       border: 1px solid rgba(255, 255, 255, 0.15);
       transition: opacity 0.25s ease;
     }
@@ -141,7 +141,7 @@
       border-radius: 14px;
       display: flex;
       flex-direction: column;
-      height: 540px;
+      height: 500px;
       overflow: hidden;
     }
 
@@ -289,7 +289,6 @@
       font-size: 0.8rem;
     }
 
-    /* Modal */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -364,10 +363,10 @@
         padding: 16px;
       }
       .wheel-stage {
-        max-width: 360px;
+        max-width: 340px;
       }
       .panel {
-        height: 420px;
+        height: 400px;
       }
     }
   </style>
@@ -385,7 +384,7 @@
   <main class="container">
     <section class="wheel-stage">
       <div class="pointer"></div>
-      <canvas id="wheelCanvas" width="700" height="700"></canvas>
+      <canvas id="wheelCanvas" width="800" height="800"></canvas>
       <div class="spin-overlay">
         <div class="spin-label" id="spinLabel">برای چرخش کلیک کنید</div>
       </div>
@@ -403,12 +402,12 @@
 
       <div class="tab-content active" id="tab-entries">
         <div class="toolbar">
-          <button class="btn" id="shuffleBtn">بُر زدن (Shuffle)</button>
-          <button class="btn" id="sortBtn">مرتب‌سازی (Sort)</button>
+          <button class="btn" id="shuffleBtn">بُر زدن</button>
+          <button class="btn" id="sortBtn">مرتب‌سازی</button>
           <button class="btn btn-danger" id="clearBtn">پاک کردن</button>
         </div>
-        <textarea id="entriesInput" placeholder="نام یا آیدی هر شرکت‌کننده رو در یک خط بنویسید..."></textarea>
-        <div class="hint">هر خط به عنوان یک گزینه روی گردونه قرار می‌گیره.</div>
+        <textarea id="entriesInput" placeholder="نام هر شرکت‌کننده در یک خط..."></textarea>
+        <div class="hint">هر خط به عنوان یک بخش روی گردونه قرار می‌گیرد.</div>
       </div>
 
       <div class="tab-content" id="tab-results">
@@ -422,7 +421,7 @@
 
   <div class="modal-backdrop" id="winnerModal">
     <div class="modal">
-      <div class="modal-header">برنده لاشیه قرعه‌کشی مشخص شد 😬</div>
+      <div class="modal-header">برنده قرعه‌کشی مشخص شد!</div>
       <div class="modal-body">
         <div class="winner-name" id="winnerText"></div>
       </div>
@@ -443,8 +442,8 @@
     ];
 
     const DEFAULT_ENTRIES = [
-      "@user1", "@user2", "@user3", "@user4", "@user5",
-      "@user6", "@user7", "@user8", "@user9", "@user10"
+      "5", "4", "3", "2", "1",
+      "6", "7", "8", "9", "10"
     ];
 
     const canvas = document.getElementById("wheelCanvas");
@@ -493,11 +492,11 @@
     function drawWheel() {
       const size = canvas.width;
       const center = size / 2;
-      const radius = center - 12;
+      const radius = center - 16;
 
       ctx.clearRect(0, 0, size, size);
 
-      const items = entries.length > 0 ? entries : ["لیست خالیه"];
+      const items = entries.length > 0 ? entries : ["لیست خالی است"];
       const count = items.length;
       const arc = (2 * Math.PI) / count;
 
@@ -514,40 +513,38 @@
         ctx.fill();
 
         ctx.lineWidth = 2;
-        ctx.strokeStyle = "rgba(18, 19, 22, 0.45)";
+        ctx.strokeStyle = "rgba(18, 19, 22, 0.5)";
         ctx.stroke();
 
-        // Draw slice text        ctx.save();
+        ctx.save();
         ctx.translate(center, center);
         ctx.rotate(startAngle + arc / 2);
         ctx.textAlign = "right";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#ffffff";
 
-        const fontSize = count > 24 ? 16 : count > 14 ? 22 : 28;
+        const fontSize = count > 20 ? 16 : count > 10 ? 22 : 30;
         ctx.font = `700 ${fontSize}px system-ui, -apple-system, sans-serif`;
-        ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
         ctx.shadowBlur = 4;
 
         let label = items[i];
-        if (label.length > 18) label = label.slice(0, 17) + "…";
-        ctx.fillText(label, radius - 26, 0);
+        if (label.length > 16) label = label.slice(0, 15) + "…";
+        ctx.fillText(label, radius - 30, 0);
         ctx.restore();
       }
 
-      // Outer rim
       ctx.beginPath();
       ctx.arc(center, center, radius, 0, 2 * Math.PI);
-      ctx.lineWidth = 6;
+      ctx.lineWidth = 8;
       ctx.strokeStyle = "#262932";
       ctx.stroke();
 
-      // Center hub
       ctx.beginPath();
-      ctx.arc(center, center, 46, 0, 2 * Math.PI);
+      ctx.arc(center, center, 48, 0, 2 * Math.PI);
       ctx.fillStyle = "#ffffff";
       ctx.fill();
-      ctx.lineWidth = 5;
+      ctx.lineWidth = 6;
       ctx.strokeStyle = "#1c1e24";
       ctx.stroke();
     }
@@ -560,10 +557,10 @@
       setControlsDisabled(true);
 
       const startAngle = currentAngle;
-      const extraSpins = 6 + Math.floor(secureRandom() * 5); // 6 to 10 full rotations
+      const extraSpins = 6 + Math.floor(secureRandom() * 4);
       const randomOffset = secureRandom() * 2 * Math.PI;
       const targetAngle = startAngle + extraSpins * 2 * Math.PI + randomOffset;
-      const duration = 4500 + secureRandom() * 1000;
+      const duration = 4500;
       const startTime = performance.now();
 
       function easeOutQuint(t) {
@@ -593,7 +590,6 @@
     function announceWinner() {
       const count = entries.length;
       const arc = (2 * Math.PI) / count;
-      // Pointer is at 0 radians (right side / 3 o'clock)
       const normalizedAngle = (2 * Math.PI - (currentAngle % (2 * Math.PI))) % (2 * Math.PI);
       const winnerIndex = Math.floor(normalizedAngle / arc) % count;
       const winner = entries[winnerIndex];
@@ -612,7 +608,7 @@
       resultsCount.textContent = results.length;
       resultsList.innerHTML = "";
       if (results.length === 0) {
-        resultsList.innerHTML = '<div class="hint" style="text-align:center;margin-top:24px;">آقا هنوز قرعه‌کشی انجام نشده.</div>';
+        resultsList.innerHTML = '<div class="hint" style="text-align:center;margin-top:24px;">هنوز قرعه‌کشی انجام نشده است.</div>';
         return;
       }
       results.forEach((name, idx) => {
@@ -637,7 +633,6 @@
       return div.innerHTML;
     }
 
-    // Confetti effect
     function launchConfetti() {
       const cCanvas = document.getElementById("confettiCanvas");
       const cCtx = cCanvas.getContext("2d");
@@ -680,10 +675,9 @@
       requestAnimationFrame(updateConfetti);
     }
 
-    // Event Listeners
     canvas.addEventListener("click", spin);
     document.getElementById("headerSpinBtn").addEventListener("click", spin);
-    entriesInput.addEventListener("input", syncEntries);
+    entriesInput.defaultInput = entriesInput.addEventListener("input", syncEntries);
 
     document.getElementById("shuffleBtn").addEventListener("click", () => {
       const arr = [...entries];
